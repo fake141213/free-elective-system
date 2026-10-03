@@ -1,3 +1,9 @@
+import os
+
+# Vercel ใช้ filesystem แบบ read-only ใน /home
+# ให้ PyThaiNLP ใช้พื้นที่ /tmp แทน
+os.environ["PYTHAINLP_DATA"] = "/tmp/pythainlp-data"
+
 from pythainlp.tokenize import word_tokenize
 
 
