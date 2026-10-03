@@ -19,11 +19,10 @@ from app.database.database import Base, engine
 from app.database import models
 
 
-# สร้างตาราง Database
-Base.metadata.create_all(bind=engine)
-
-
+# ========================================
 # สร้าง FastAPI Application
+# ========================================
+
 app = FastAPI(
     title="Free Elective System API",
     description="API สำหรับระบบเสนอและวิเคราะห์ความต้องการรายวิชาเสรีของนักศึกษา",
@@ -31,7 +30,10 @@ app = FastAPI(
 )
 
 
+# ========================================
 # CORS
+# ========================================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -45,7 +47,10 @@ app.add_middleware(
 )
 
 
+# ========================================
 # Root
+# ========================================
+
 @app.get("/")
 def root():
     return {
@@ -53,7 +58,10 @@ def root():
     }
 
 
+# ========================================
 # Health Check
+# ========================================
+
 @app.get("/health")
 def health_check():
     return {
@@ -61,7 +69,10 @@ def health_check():
     }
 
 
+# ========================================
 # Database Health Check
+# ========================================
+
 @app.get("/health/db")
 def db_health():
     with engine.connect() as conn:
@@ -74,21 +85,30 @@ def db_health():
         }
 
 
+# ========================================
 # Suggestions API
+# ========================================
+
 app.include_router(
     suggestions_router,
     prefix="/api"
 )
 
 
+# ========================================
 # Dashboard API
+# ========================================
+
 app.include_router(
     dashboard_router,
     prefix="/api"
 )
 
 
+# ========================================
 # Authentication API
+# ========================================
+
 app.include_router(
     auth_router,
     prefix="/api"
