@@ -1,7 +1,7 @@
 import os
 
-# กำหนด path สำหรับข้อมูล PyThaiNLP
-# Vercel ไม่อนุญาตให้เขียนลง /home
+# Vercel ใช้ filesystem แบบ read-only ใน /home
+# ให้ PyThaiNLP ใช้พื้นที่ /tmp แทน
 os.environ["PYTHAINLP_DATA"] = "/tmp/pythainlp-data"
 
 from dotenv import load_dotenv
@@ -19,9 +19,11 @@ from app.database.database import Base, engine
 from app.database import models
 
 
+# สร้างตาราง Database
 Base.metadata.create_all(bind=engine)
 
 
+# สร้าง FastAPI Application
 app = FastAPI(
     title="Free Elective System API",
     description="API สำหรับระบบเสนอและวิเคราะห์ความต้องการรายวิชาเสรีของนักศึกษา",
@@ -29,6 +31,7 @@ app = FastAPI(
 )
 
 
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -41,6 +44,7 @@ app.add_middleware(
 )
 
 
+# Root
 @app.get("/")
 def root():
     return {
@@ -48,6 +52,7 @@ def root():
     }
 
 
+# Health Check
 @app.get("/health")
 def health_check():
     return {
@@ -55,18 +60,21 @@ def health_check():
     }
 
 
+# Suggestions API
 app.include_router(
     suggestions_router,
     prefix="/api"
 )
 
 
+# Dashboard API
 app.include_router(
     dashboard_router,
     prefix="/api"
 )
 
 
+# Authentication API
 app.include_router(
     auth_router,
     prefix="/api"
