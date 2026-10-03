@@ -12,15 +12,27 @@ from sqlalchemy.pool import NullPool
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+print("===== DATABASE DEBUG =====")
+print("DATABASE_URL exists:", bool(DATABASE_URL))
+
+if DATABASE_URL:
+    print(
+        "DATABASE_URL prefix:",
+        DATABASE_URL.split("://")[0]
+    )
+else:
+    print("DATABASE_URL is NOT SET")
+
 
 # =========================
 # Local development
 # =========================
 
-# ถ้าไม่มี DATABASE_URL ให้ใช้ SQLite เหมือนเดิม
 if not DATABASE_URL:
     BASE_DIR = Path(__file__).resolve().parents[2]
+
     DATABASE_PATH = BASE_DIR / "data" / "free_elective.db"
+
     DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 
 
@@ -43,24 +55,44 @@ elif DATABASE_URL.startswith("postgresql://"):
     )
 
 
+print(
+    "Database driver:",
+    DATABASE_URL.split("://")[0]
+)
+
+
 # =========================
 # Engine
 # =========================
 
-if DATABASE_URL.startswith("sqlite"):
-    engine = create_engine(
-        DATABASE_URL,
-        connect_args={
-            "check_same_thread": False
-        },
-    )
+try:
 
-else:
-    engine = create_engine(
-        DATABASE_URL,
-        poolclass=NullPool,
-        pool_pre_ping=True,
-    )
+    if DATABASE_URL.startswith("sqlite"):
+
+        engine = create_engine(
+            DATABASE_URL,
+            connect_args={
+                "check_same_thread": False
+            },
+        )
+
+    else:
+
+        engine = create_engine(
+            DATABASE_URL,
+            poolclass=NullPool,
+            pool_pre_ping=True,
+        )
+
+    print("Database engine created successfully")
+
+except Exception as e:
+
+    print("DATABASE ENGINE ERROR:")
+    print(type(e).__name__)
+    print(str(e))
+
+    raise
 
 
 # =========================
@@ -86,6 +118,7 @@ Base = declarative_base()
 # =========================
 
 def get_db():
+
     db = SessionLocal()
 
     try:
