@@ -1,3 +1,9 @@
+import os
+
+# กำหนด path สำหรับข้อมูล PyThaiNLP
+# Vercel ไม่อนุญาตให้เขียนลง /home
+os.environ["PYTHAINLP_DATA"] = "/tmp/pythainlp-data"
+
 from dotenv import load_dotenv
 
 load_dotenv()
