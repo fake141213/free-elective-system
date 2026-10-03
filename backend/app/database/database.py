@@ -13,7 +13,10 @@ from sqlalchemy.pool import NullPool
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
-# Local development:
+# =========================
+# Local development
+# =========================
+
 # ถ้าไม่มี DATABASE_URL ให้ใช้ SQLite เหมือนเดิม
 if not DATABASE_URL:
     BASE_DIR = Path(__file__).resolve().parents[2]
@@ -22,7 +25,7 @@ if not DATABASE_URL:
 
 
 # =========================
-# Engine
+# PostgreSQL URL
 # =========================
 
 if DATABASE_URL.startswith("postgres://"):
@@ -40,11 +43,18 @@ elif DATABASE_URL.startswith("postgresql://"):
     )
 
 
+# =========================
+# Engine
+# =========================
+
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
         DATABASE_URL,
-        connect_args={"check_same_thread": False},
+        connect_args={
+            "check_same_thread": False
+        },
     )
+
 else:
     engine = create_engine(
         DATABASE_URL,
@@ -80,5 +90,6 @@ def get_db():
 
     try:
         yield db
+
     finally:
         db.close()
