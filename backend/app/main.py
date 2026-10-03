@@ -5,11 +5,11 @@ import os
 os.environ["PYTHAINLP_DATA"] = "/tmp/pythainlp-data"
 
 from dotenv import load_dotenv
-
 load_dotenv()
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.api.suggestions import router as suggestions_router
 from app.api.dashboard import router as dashboard_router
@@ -59,6 +59,19 @@ def health_check():
     return {
         "status": "ok"
     }
+
+
+# Database Health Check
+@app.get("/health/db")
+def db_health():
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT 1"))
+
+        return {
+            "status": "ok",
+            "database": engine.dialect.name,
+            "result": result.scalar(),
+        }
 
 
 # Suggestions API
